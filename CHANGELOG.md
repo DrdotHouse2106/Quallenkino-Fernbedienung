@@ -5,6 +5,7 @@ Die Einträge unter einer Versionsnummer erscheinen beim Release automatisch in 
 
 ## 1.3.9
 
+- Sicherheit: Abmelden in Jellyfin Web meldet auch die Fernbedienung in diesem Browser ab (ihr eigenes Token wird widerrufen und gelöscht)
 - Nach einer abgelaufenen Anmeldung schickt die Fernbedienung keine weiteren Anfragen mit dem ungültigen Token (Diagnose-Timer und API-Client werden beendet)
 - Offline-Speicher behandelt nur noch bekannte App-Dateien – auch wenn die App ohne Plugin im Wurzelverzeichnis einer Adresse liegt
 - iPhone-App: Beim Verbinden per Link wird der Server-Name deutlich hervorgehoben

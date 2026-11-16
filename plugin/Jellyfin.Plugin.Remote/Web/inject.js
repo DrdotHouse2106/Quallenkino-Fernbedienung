@@ -617,6 +617,23 @@
         });
     }
 
+    /** Abmelden in Jellyfin Web meldet auch die Fernbedienung ab – sonst bliebe ihr Token im Browser. */
+    function hookLogout() {
+        var apiClient = window.ApiClient;
+        if (!apiClient || typeof apiClient.logout !== 'function' || apiClient.__remoteLogoutHooked) return;
+        var original = apiClient.logout;
+        apiClient.logout = function () {
+            var self = this, args = arguments;
+            var config = readJson(CONFIG_KEY);
+            if (config.authMode !== 'user') return original.apply(self, args); // API-Schlüssel bleibt
+            try { localStorage.removeItem(CONFIG_KEY); } catch (e) { /* ignorieren */ }
+            return revokeOldToken(config, null).then(function () { return original.apply(self, args); });
+        };
+        apiClient.__remoteLogoutHooked = true;
+    }
+    hookLogout();
+    setInterval(hookLogout, 2000); // ApiClient entsteht erst nach dem Laden bzw. nach einer neuen Anmeldung
+
     var opening = false;
 
     /** Öffnet die Fernbedienung im selben Fenster – so bleibt sie auch in den Jellyfin-Apps. */
