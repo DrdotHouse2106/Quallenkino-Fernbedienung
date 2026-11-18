@@ -627,7 +627,10 @@
             var config = readJson(CONFIG_KEY);
             if (config.authMode !== 'user') return original.apply(self, args); // API-Schlüssel bleibt
             try { localStorage.removeItem(CONFIG_KEY); } catch (e) { /* ignorieren */ }
-            return revokeOldToken(config, null).then(function () { return original.apply(self, args); });
+            // Höchstens 3 Sekunden warten – ist der Server nicht erreichbar, darf das Abmelden nicht hängen
+            var revoke = revokeOldToken(config, null);
+            var timeout = new Promise(function (resolve) { setTimeout(resolve, 3000); });
+            return Promise.race([revoke, timeout]).then(function () { return original.apply(self, args); });
         };
         apiClient.__remoteLogoutHooked = true;
     }
